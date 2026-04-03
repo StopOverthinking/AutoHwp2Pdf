@@ -18,11 +18,11 @@ internal sealed record InstallResult(
 
 internal static class InstallerOperations
 {
-    private const string AppProcessName = "AutoHwp2Pdf";
-    private const string StartMenuFolderName = "AutoHwp2Pdf";
-    private const string MaintenanceExeName = "AutoHwp2Pdf Maintenance.exe";
-    private const string LauncherScriptFileName = "Launch-AutoHwp2PdfHidden.vbs";
-    private const string RegistryKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\AutoHwp2Pdf";
+    private const string AppProcessName = "AutoHwp2Anything";
+    private const string StartMenuFolderName = "AutoHwp2Anything";
+    private const string MaintenanceExeName = "AutoHwp2Anything Maintenance.exe";
+    private const string LauncherScriptFileName = "Launch-AutoHwp2AnythingHidden.vbs";
+    private const string RegistryKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\AutoHwp2Anything";
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -31,18 +31,18 @@ internal static class InstallerOperations
 
     private static readonly string[] PayloadFiles =
     {
-        "AutoHwp2Pdf.deps.json",
-        "AutoHwp2Pdf.dll",
-        "AutoHwp2Pdf.exe",
-        "AutoHwp2Pdf.pdb",
-        "AutoHwp2Pdf.runtimeconfig.json",
+        "AutoHwp2Anything.deps.json",
+        "AutoHwp2Anything.dll",
+        "AutoHwp2Anything.exe",
+        "AutoHwp2Anything.pdb",
+        "AutoHwp2Anything.runtimeconfig.json",
         "FilePathCheckerModuleExample.dll",
-        "Launch-AutoHwp2Pdf.cmd",
-        "Launch-AutoHwp2Pdf.ps1"
+        "Launch-AutoHwp2Anything.cmd",
+        "Launch-AutoHwp2Anything.ps1"
     };
 
     public static string DefaultInstallDirectory =>
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "AutoHwp2Pdf");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "AutoHwp2Anything");
 
     public static bool IsAppRunning()
     {
@@ -154,8 +154,9 @@ internal static class InstallerOperations
         var documentsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         root["UiLanguage"] = request.Language == InstallerLanguage.Korean ? "Korean" : "English";
         root["WatchFolder"] ??= documentsDirectory;
-        root["OutputRoot"] ??= Path.Combine(documentsDirectory, "hwp2pdf");
-        root["OutputSubfolderName"] ??= "Hwp2Pdf";
+        root["OutputRoot"] ??= Path.Combine(documentsDirectory, "hwp2anything");
+        root["OutputSubfolderName"] ??= "pdf";
+        root["OutputFormat"] ??= "Pdf";
         root["OutputMode"] ??= "CustomRoot";
         root["IncludeSubdirectories"] ??= true;
         root["RunAtStartup"] ??= true;
@@ -170,7 +171,7 @@ internal static class InstallerOperations
 
     private static string BuildLauncherScript(string installDirectory)
     {
-        var launcherPath = Path.Combine(installDirectory, "Launch-AutoHwp2Pdf.cmd");
+        var launcherPath = Path.Combine(installDirectory, "Launch-AutoHwp2Anything.cmd");
         return
             "Set shell = CreateObject(\"WScript.Shell\")" + Environment.NewLine +
             $"shell.CurrentDirectory = \"{EscapeForVbScript(installDirectory)}\"" + Environment.NewLine +
@@ -187,13 +188,13 @@ internal static class InstallerOperations
         var startMenuFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), StartMenuFolderName);
         Directory.CreateDirectory(startMenuFolder);
 
-        var desktopShortcutPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "AutoHwp2Pdf.lnk");
-        var appShortcutPath = Path.Combine(startMenuFolder, "AutoHwp2Pdf.lnk");
+        var desktopShortcutPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "AutoHwp2Anything.lnk");
+        var appShortcutPath = Path.Combine(startMenuFolder, "AutoHwp2Anything.lnk");
         var uninstallShortcutPath = Path.Combine(startMenuFolder, $"{Localization.Get(request.Language, "UninstallShortcutName")}.lnk");
         var uninstallShortcutCandidates = new[]
         {
-            Path.Combine(startMenuFolder, "AutoHwp2Pdf 제거.lnk"),
-            Path.Combine(startMenuFolder, "Uninstall AutoHwp2Pdf.lnk")
+            Path.Combine(startMenuFolder, "AutoHwp2Anything \uC81C\uAC70.lnk"),
+            Path.Combine(startMenuFolder, "Uninstall AutoHwp2Anything.lnk")
         };
 
         foreach (var candidatePath in uninstallShortcutCandidates)
@@ -209,7 +210,7 @@ internal static class InstallerOperations
             Path.Combine(Environment.SystemDirectory, "wscript.exe"),
             $"\"{launcherScriptPath}\"",
             request.InstallDirectory,
-            Path.Combine(request.InstallDirectory, "AutoHwp2Pdf.exe"));
+            Path.Combine(request.InstallDirectory, "AutoHwp2Anything.exe"));
 
         CreateShortcut(
             uninstallShortcutPath,
@@ -225,7 +226,7 @@ internal static class InstallerOperations
                 Path.Combine(Environment.SystemDirectory, "wscript.exe"),
                 $"\"{launcherScriptPath}\"",
                 request.InstallDirectory,
-                Path.Combine(request.InstallDirectory, "AutoHwp2Pdf.exe"));
+                Path.Combine(request.InstallDirectory, "AutoHwp2Anything.exe"));
         }
         else if (File.Exists(desktopShortcutPath))
         {
@@ -248,11 +249,11 @@ internal static class InstallerOperations
     private static void RegisterUninstallEntry(InstallRequest request, string maintenanceExePath, string payloadDirectory)
     {
         using var key = Registry.CurrentUser.CreateSubKey(RegistryKeyPath);
-        key?.SetValue("DisplayName", "AutoHwp2Pdf");
+        key?.SetValue("DisplayName", "AutoHwp2Anything");
         key?.SetValue("DisplayVersion", "1.0.0");
-        key?.SetValue("Publisher", "AutoHwp2Pdf");
+        key?.SetValue("Publisher", "AutoHwp2Anything");
         key?.SetValue("InstallLocation", request.InstallDirectory);
-        key?.SetValue("DisplayIcon", Path.Combine(request.InstallDirectory, "AutoHwp2Pdf.exe"));
+        key?.SetValue("DisplayIcon", Path.Combine(request.InstallDirectory, "AutoHwp2Anything.exe"));
         key?.SetValue("UninstallString", $"\"{maintenanceExePath}\" --uninstall --install-dir \"{request.InstallDirectory}\"");
         key?.SetValue("QuietUninstallString", $"\"{maintenanceExePath}\" --uninstall --install-dir \"{request.InstallDirectory}\"");
         key?.SetValue("NoModify", 1, RegistryValueKind.DWord);
@@ -273,7 +274,7 @@ internal static class InstallerOperations
 
     private static void RemoveShortcuts()
     {
-        var desktopShortcutPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "AutoHwp2Pdf.lnk");
+        var desktopShortcutPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "AutoHwp2Anything.lnk");
         if (File.Exists(desktopShortcutPath))
         {
             File.Delete(desktopShortcutPath);
@@ -293,7 +294,7 @@ internal static class InstallerOperations
 
     private static void ScheduleInstallDirectoryDeletion(string installDirectory)
     {
-        var cleanupScriptPath = Path.Combine(Path.GetTempPath(), $"AutoHwp2Pdf-Uninstall-{Guid.NewGuid():N}.cmd");
+        var cleanupScriptPath = Path.Combine(Path.GetTempPath(), $"AutoHwp2Anything-Uninstall-{Guid.NewGuid():N}.cmd");
         var script = $"""
 @echo off
 :retry

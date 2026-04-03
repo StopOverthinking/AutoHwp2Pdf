@@ -6,7 +6,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 $appDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$appExePath = Join-Path $appDir "AutoHwp2Pdf.exe"
+$appExePath = Join-Path $appDir "AutoHwp2Anything.exe"
 $localDotnetRoot = Join-Path $appDir ".dotnet"
 $dotnetInstallScriptPath = Join-Path $localDotnetRoot "dotnet-install.ps1"
 $requiredChannel = "9.0"
@@ -68,7 +68,7 @@ function Ensure-LocalDesktopRuntime {
 }
 
 if (-not (Test-Path $appExePath)) {
-    throw "AutoHwp2Pdf.exe was not found next to the launcher."
+    throw "AutoHwp2Anything.exe was not found next to the launcher."
 }
 
 if (-not (Test-LocalDesktopRuntime) -and -not (Test-SystemDesktopRuntime)) {

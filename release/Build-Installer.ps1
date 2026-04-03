@@ -5,21 +5,28 @@ $ErrorActionPreference = "Stop"
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $setupProjectPath = Join-Path $PSScriptRoot "AutoHwp2PdfSetup\AutoHwp2PdfSetup.csproj"
 $setupProjectDirectory = Split-Path -Parent $setupProjectPath
+$appProjectPath = Join-Path $projectRoot "AutoHwp2Anything.csproj"
+$appPublishDirectory = Join-Path $projectRoot "bin\Release\net9.0-windows\win-x64\publish"
 $payloadDirectory = Join-Path $PSScriptRoot "payload"
 $publishDirectory = Join-Path $PSScriptRoot "publish"
-$setupExePath = Join-Path $PSScriptRoot "AutoHwp2PdfSetup.exe"
-$packageZipPath = Join-Path $PSScriptRoot "AutoHwp2PdfSetup-package.zip"
+$setupExePath = Join-Path $PSScriptRoot "AutoHwp2AnythingSetup.exe"
+$packageZipPath = Join-Path $PSScriptRoot "AutoHwp2AnythingSetup-package.zip"
 
 $payloadFiles = @(
-    "AutoHwp2Pdf.deps.json",
-    "AutoHwp2Pdf.dll",
-    "AutoHwp2Pdf.exe",
-    "AutoHwp2Pdf.pdb",
-    "AutoHwp2Pdf.runtimeconfig.json",
+    "AutoHwp2Anything.deps.json",
+    "AutoHwp2Anything.dll",
+    "AutoHwp2Anything.exe",
+    "AutoHwp2Anything.pdb",
+    "AutoHwp2Anything.runtimeconfig.json",
     "FilePathCheckerModuleExample.dll",
-    "Launch-AutoHwp2Pdf.cmd",
-    "Launch-AutoHwp2Pdf.ps1"
+    "Launch-AutoHwp2Anything.cmd",
+    "Launch-AutoHwp2Anything.ps1"
 )
+
+dotnet publish $appProjectPath `
+    -c Release `
+    -r win-x64 `
+    --self-contained false
 
 if (Test-Path $payloadDirectory) {
     Remove-Item -LiteralPath $payloadDirectory -Recurse -Force
@@ -28,7 +35,7 @@ if (Test-Path $payloadDirectory) {
 New-Item -ItemType Directory -Path $payloadDirectory -Force | Out-Null
 
 foreach ($fileName in $payloadFiles) {
-    $sourcePath = Join-Path $projectRoot $fileName
+    $sourcePath = Join-Path $appPublishDirectory $fileName
     if (-not (Test-Path $sourcePath)) {
         throw "Payload source file not found: $sourcePath"
     }
